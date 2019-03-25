@@ -1,0 +1,20 @@
+{
+    "parameters": {
+        "CHROMEDRIVER_PATH": "/path/to/chromedriver",
+        "CHROME_PATH": "/path/to/chrome-executable",
+        "OUT_FILE_NAME": "output_datafile.json",
+        "LOG_DIRECTORY": "./logdir/",
+        "N_PAGES": 1,
+        "QUERIES": [
+            "site:linkedin.com/in/ AND Direttore di Filiale",
+            "site:linkedin.com/in/ AND District Manager",
+            "site:linkedin.com/in/ AND Events Assistant",
+            "site:linkedin.com/in/ AND Junior Key Account Manager",
+            "site:linkedin.com/in/ AND Social Media Manager"
+        ]
+    },
+    "credentials": {
+        "USERNAME": "linkedin_username",
+        "PASSWORD": "linkedin_password"
+    }
+}
