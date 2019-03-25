@@ -37,7 +37,7 @@ def create_nonexistent_dir(path, exc_raise=False):
     except OSError as e:
         if e.errno != errno.EEXIST:
             print("ERROR :: Could not create directory with path: " +
-                  "%s\n", path)
+                  "%s\n", str(path))
             if exc_raise:
                 raise
         return None
