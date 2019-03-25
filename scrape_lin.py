@@ -54,7 +54,7 @@ for query in QUERIES:
     linkedin_urls = get_urls(driver, N_PAGES)
     unseen_urls = get_unseen_urls(LOG_DIRECTORY,
                                   linkedin_urls)
-    if len(linkedin_urls) != len(unseen_urls):
+    if len(linkedin_urls) != len(unseen_urls) and len(unseen_urls) != 0:
         print("INFO :: Resuming from URL", unseen_urls[0])
     for linkedin_url in unseen_urls:
         user_data = scrape_url(query, linkedin_url, driver)
