@@ -362,13 +362,12 @@ def get_unseen_urls(logdir, urls):
     Return a list of URLs which have not already been scraped.
 
     """
-    already_seen_urls = []
+    unseen_urls = []
     for logfile in os.listdir(logdir):
         with open(logdir + logfile, 'r') as logfile:
             data = json.load(logfile)
-            if data["URL"] in urls:
-                already_seen_urls.append(data["URL"])
-    unseen_urls = sorted(list(set(urls) - set(already_seen_urls)))
+            if data["URL"] not in urls:
+                unseen_urls.append(data["URL"])
     return unseen_urls
 
 
