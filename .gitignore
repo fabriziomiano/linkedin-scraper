@@ -1,0 +1,9 @@
+# binary files
+*.pyc
+*~
+*.ipynb
+
+# dirs
+*.ipynb*
+.venv/
+log/
