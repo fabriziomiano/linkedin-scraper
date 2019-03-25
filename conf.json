@@ -6,11 +6,16 @@
         "LOG_DIRECTORY": "./logdir/",
         "N_PAGES": 1,
         "QUERIES": [
-            "site:linkedin.com/in/ AND Direttore di Filiale",
-            "site:linkedin.com/in/ AND District Manager",
-            "site:linkedin.com/in/ AND Events Assistant",
-            "site:linkedin.com/in/ AND Junior Key Account Manager",
-            "site:linkedin.com/in/ AND Social Media Manager"
+	    "site: linkedin.com/in/ AND \"Direttore di Filiale\"",
+	    "site: linkedin.com/in/ AND \"District Manager\"",
+	    "site: linkedin.com/in/ AND \"Events Assistant\"",
+	    "site: linkedin.com/in/ AND \"Junior Key Account Manager\"",
+	    "site: linkedin.com/in/ AND \"Social Media Manager\"",
+	    "site: linkedin.com/in/ AND \"Customer Care\"",
+	    "site: linkedin.com/in/ AND \"Consulente Junior\"",
+	    "site: linkedin.com/in/ AND \"Assistente alla clientela\"",
+	    "site: linkedin.com/in/ AND \"Junior Project Manager\"",
+	    "site: linkedin.com/in/ AND \"Junior HR\""
         ]
     },
     "credentials": {
