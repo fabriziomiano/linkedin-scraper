@@ -290,6 +290,7 @@ def scrape_url(query, url, driver):
     attempt = 0
     MAX_ATTEMPTS = 3
     success = False
+    user_data = {}
     while not success:
         try:
             attempt += 1
@@ -325,10 +326,9 @@ def scrape_url(query, url, driver):
             sleep(60)
         if success:
             break
-        if attempt == MAX_ATTEMPTS:
+        if attempt == MAX_ATTEMPTS and not user_data:
             print("INFO :: Max number of attempts reached. Skipping URL"
-                  "User data will be empty.")
-            user_data = {}
+                  "\nUser data will be empty.")
     return user_data
 
 
@@ -347,7 +347,7 @@ def save_json(file_path, dictionary):
     Save a json file at a given path.
 
     """
-    with open(file_path, 'w') as f:
+    with open(file_path, 'w', encoding='utf8') as f:
         json.dump(dictionary, f, ensure_ascii=False,
                   indent=2, separators=(',', ': '))
 
@@ -362,12 +362,14 @@ def get_unseen_urls(logdir, urls):
     Return a list of URLs which have not already been scraped.
 
     """
-    unseen_urls = []
+    unseen_urls = list(urls)
     for logfile in os.listdir(logdir):
         with open(logdir + logfile, 'r') as logfile:
             data = json.load(logfile)
-            if data["URL"] not in urls:
-                unseen_urls.append(data["URL"])
+        try:
+            unseen_urls.remove(data["URL"])
+        except ValueError:
+            pass
     return unseen_urls
 
 
