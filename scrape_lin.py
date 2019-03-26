@@ -10,7 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from utils import init_driver, get_urls, login, scrape_url,\
     print_user_data, save_json, create_nonexistent_dir, load_config,\
-    get_unseen_urls, make_dataset
+    get_unseen_urls, init_mongo
 from time import sleep, time
 import argparse
 import json
@@ -37,12 +37,17 @@ CHROMEDRIVER_PATH = parameters["CHROMEDRIVER_PATH"]
 LOG_DIRECTORY = parameters["LOG_DIRECTORY"]
 QUERIES = parameters["QUERIES"]
 N_PAGES = parameters["N_PAGES"]
-OUT_FILE_NAME = parameters["OUT_FILE_NAME"]
-USERNAME = credentials["USERNAME"]
-PASSWORD = credentials["PASSWORD"]
+LINUSERNAME = credentials["LINUSERNAME"]
+LINPWD = credentials["LINPWD"]
+MONGOUSER = credentials["MONGOUSER"]
+MONGOPWD = credentials["MONGOPWD"]
+HOST = parameters["HOST"]
+client = init_mongo(HOST, MONGOUSER, MONGOPWD)
+db = client["linkedin"]
+users = db["users"]
 driver = init_driver(CHROME_PATH, CHROMEDRIVER_PATH)
 driver.get("https://www.linkedin.com")
-login(driver, USERNAME, PASSWORD)
+login(driver, LINUSERNAME, LINPWD)
 create_nonexistent_dir(LOG_DIRECTORY)
 for query in QUERIES:
     driver.get("https://www.google.com")
@@ -52,7 +57,7 @@ for query in QUERIES:
     sleep(0.5)
     search_query.send_keys(Keys.RETURN)
     linkedin_urls = get_urls(driver, N_PAGES)
-    unseen_urls = get_unseen_urls(LOG_DIRECTORY,
+    unseen_urls = get_unseen_urls(users,
                                   linkedin_urls)
     if len(linkedin_urls) != len(unseen_urls) and len(unseen_urls) != 0:
         print("INFO :: Resuming from URL", unseen_urls[0])
@@ -64,7 +69,8 @@ for query in QUERIES:
     for linkedin_url in unseen_urls:
         user_data = scrape_url(query, linkedin_url, driver)
         print_user_data(user_data)
-        user_file = str(time())
-        save_json(LOG_DIRECTORY + user_file, user_data)
+        user_file = LOG_DIRECTORY + str(time())
+        save_json(user_file, user_data)
+        if not db["users"].count_documents(user_data, limit = 1):
+            users.insert_one(user_data)
 driver.quit()
-make_dataset(LOG_DIRECTORY, OUT_FILE_NAME)
