@@ -2,24 +2,26 @@
     "parameters": {
         "CHROMEDRIVER_PATH": "/path/to/chromedriver",
         "CHROME_PATH": "/path/to/chrome-executable",
-        "OUT_FILE_NAME": "output_datafile.json",
         "LOG_DIRECTORY": "./logdir/",
         "N_PAGES": 1,
         "QUERIES": [
-	    "site:linkedin.com/in/ AND \"Direttore di Filiale\"",
-	    "site:linkedin.com/in/ AND \"District Manager\"",
-	    "site:linkedin.com/in/ AND \"Events Assistant\"",
-	    "site:linkedin.com/in/ AND \"Junior Key Account Manager\"",
-	    "site:linkedin.com/in/ AND \"Social Media Manager\"",
-	    "site:linkedin.com/in/ AND \"Customer Care\"",
-	    "site:linkedin.com/in/ AND \"Consulente Junior\"",
-	    "site:linkedin.com/in/ AND \"Assistente alla clientela\"",
-	    "site:linkedin.com/in/ AND \"Junior Project Manager\"",
-	    "site:linkedin.com/in/ AND \"Junior HR\""
-        ]
+            "site:linkedin.com/in/ AND \"Direttore di Filiale\"",
+            "site:linkedin.com/in/ AND \"District Manager\"",
+            "site:linkedin.com/in/ AND \"Events Assistant\"",
+            "site:linkedin.com/in/ AND \"Junior Key Account Manager\"",
+            "site:linkedin.com/in/ AND \"Social Media Manager\"",
+            "site:linkedin.com/in/ AND \"Customer Care\"",
+            "site:linkedin.com/in/ AND \"Consulente Junior\"",
+            "site:linkedin.com/in/ AND \"Assistente alla clientela\"",
+            "site:linkedin.com/in/ AND \"Junior Project Manager\"",
+            "site:linkedin.com/in/ AND \"Junior HR\""
+        ],
+        "HOST": "@cluster0-bicnw.mongodb.net/linkedin?retryWrites=true"
     },
     "credentials": {
-        "USERNAME": "linkedin_username",
-        "PASSWORD": "linkedin_password"
+        "LINUSERNAME": "user@email.com",
+        "LINPWD": "linkedinpwd",
+        "MONGOUSER": "mongouser",
+        "MONGOPWD": "mongopwd"
     }
 }
