@@ -2,6 +2,8 @@
 *.pyc
 *~
 *.ipynb
+myconf.json
+*.log
 
 # dirs
 *.ipynb*
