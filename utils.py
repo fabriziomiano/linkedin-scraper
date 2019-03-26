@@ -8,6 +8,8 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException,\
     TimeoutException
 from bs4 import BeautifulSoup as bs
+from pymongo import MongoClient
+from validator_collection import checkers
 import uuid
 import json
 import os
@@ -81,14 +83,16 @@ def get_urls(driver, n_pages=1):
     linkedin_urls = []
     for i in range(n_pages):
         urls = driver.find_elements_by_class_name('iUh30')
-        linkedin_urls += [url.text for url in urls]
+        linkedin_urls += [url.text for url in urls
+                          if checkers.is_url(url.text)]
         sleep(0.5)
-        try:
-            nextpage_button_url = driver.find_element_by_css_selector(
-                '#pnnext').get_attribute('href')
-            driver.get(nextpage_button_url)
-        except NoSuchElementException:
-            break
+        if i > 1:
+            try:
+                next_button_url = driver.find_element_by_css_selector(
+                    '#pnnext').get_attribute('href')
+                driver.get(next_button_url)
+            except NoSuchElementException:
+                break
     linkedin_urls_no_rep = sorted(
         list(dict.fromkeys([url for url in linkedin_urls])))
     return linkedin_urls_no_rep
@@ -310,7 +314,7 @@ def scrape_url(query, url, driver):
             user_data = {
                 "URL": url,
                 "name": name,
-                "query": query.split('AND ')[-1].replace('\"', ''),
+                "query": query,
                 "job_title": job_title,
                 "degree": degree,
                 "location": location,
@@ -352,38 +356,25 @@ def save_json(file_path, dictionary):
                   indent=2, separators=(',', ': '))
 
 
-def get_unseen_urls(logdir, urls):
+def get_unseen_urls(users, urls):
     """
     Get a list of URLs that have not already been scraped.
-    Loop over all the log files and create a list with all the
+    Loop over all the db entries and create a list with the
     URLs already scraped.
     Get the difference of such list and the list of all the URLs
     for a given query.
     Return a list of URLs which have not already been scraped.
 
     """
-    unseen_urls = list(urls)
-    for logfile in os.listdir(logdir):
-        with open(logdir + logfile, 'r') as logfile:
-            data = json.load(logfile)
-        try:
-            unseen_urls.remove(data["URL"])
-        except ValueError:
-            pass
+    scraped_urls = [entry["URL"] for entry in users.find()]
+    unseen_urls = list(set(urls) - set(scraped_urls))
     return unseen_urls
 
 
-def make_dataset(logdir, outfile):
+def init_mongo(host, user, pwd):
     """
-    Write all the scraped data to disk by looping over all the single
-    user files saved within the LOGDIR.
+    Initialize mongodb client instance
 
     """
-    data = []
-    print("INFO :: Creating dataset")
-    for logfile in os.listdir(logdir):
-        with open(logdir + logfile, 'r') as logfile:
-            user_data = json.load(logfile)
-        data.append(user_data)
-    save_json(outfile, data)
-    print("INFO :: Dataset saved at " + outfile)
+    client = MongoClient("mongodb+srv://" + user + ":" + pwd + host)
+    return client
