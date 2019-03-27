@@ -71,6 +71,7 @@ for query in QUERIES:
         print_user_data(user_data)
         user_file = LOG_DIRECTORY + str(time())
         save_json(user_file, user_data)
-        if not db["users"].count_documents(user_data, limit = 1):
+        if user_data and\
+           not db["users"].count_documents(user_data, limit = 1):
             users.insert_one(user_data)
 driver.quit()
