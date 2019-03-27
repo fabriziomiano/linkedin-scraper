@@ -2,10 +2,10 @@
 *.pyc
 *~
 *.ipynb
-myconf.json
+*myconf*.json
 *.log
 
 # dirs
 *.ipynb*
 .venv/
-log/
+*log*
