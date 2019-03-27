@@ -58,6 +58,28 @@ def validate_field(field):
     return field
 
 
+def validate_user_data(user_data):
+    """
+    Validate user_data dict by checking that the majority of the keys
+    have non-empty values.
+    Return an empty dictionary if main keys' values are empty,
+    otherwise the original dictionary.
+
+    """
+    try:
+        if user_data["skills"] == []\
+           and user_data["languages"] == []\
+           and user_data["name"] == ""\
+           and user_data["job_title"] == ""\
+           and user_data["degree"] == ""\
+           and user_data["location"] == "":
+            return {}
+        else:
+            return user_data
+    except KeyError:
+        return {}
+
+
 def init_driver(CHROME_PATH, CHROMEDRIVER_PATH):
     """
     Initialize Chrome driver
@@ -333,7 +355,7 @@ def scrape_url(query, url, driver):
         if attempt == MAX_ATTEMPTS and not user_data:
             print("INFO :: Max number of attempts reached. Skipping URL"
                   "\nUser data will be empty.")
-    return user_data
+    return validate_user_data(user_data)
 
 
 def print_user_data(user_data):
