@@ -1,19 +1,17 @@
 """
 Scrape linkedin URLs by using selenium, to simulate the navigation
 (click, scroll) and BeautifulSoup to parse the HTML code of the page
-Perform a number of queries and log a number of files 
+Perform a number of queries and log a number of files
 for each scraped user.
 Write dataset to disk with the scraped data from all the users
 
 """
-from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from utils import init_driver, get_urls, login, scrape_url,\
     print_user_data, save_json, create_nonexistent_dir, load_config,\
     get_unseen_urls, init_mongo
 from time import sleep, time
 import argparse
-import json
 import sys
 
 
@@ -26,8 +24,7 @@ parser.add_argument('-c', '--conf',
                     type=str,
                     metavar='',
                     required=True,
-                    help='Specify the path of the configuration file'
-)
+                    help='Specify the path of the configuration file')
 args = parser.parse_args()
 conf = load_config(args.conf)
 parameters = conf["parameters"]
@@ -63,7 +60,7 @@ for query in QUERIES:
         print("INFO :: Resuming from URL", unseen_urls[0])
     if len(unseen_urls) == 0:
         print("INFO :: All URLs from %d Google-search "
-              "page(s) already scraped. Quitting" %N_PAGES)
+              "page(s) already scraped. Quitting" % N_PAGES)
         driver.quit()
         sys.exit()
     for linkedin_url in unseen_urls:
@@ -72,6 +69,6 @@ for query in QUERIES:
         user_file = LOG_DIRECTORY + str(time())
         save_json(user_file, user_data)
         if user_data and\
-           not db["users"].count_documents(user_data, limit = 1):
+           not db["users"].count_documents(user_data, limit=1):
             users.insert_one(user_data)
 driver.quit()
