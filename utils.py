@@ -10,7 +10,6 @@ from selenium.common.exceptions import NoSuchElementException,\
 from bs4 import BeautifulSoup as bs
 from pymongo import MongoClient
 from validator_collection import checkers
-import uuid
 import json
 import os
 import errno
@@ -198,6 +197,7 @@ def scroll_to_end(driver):
         else:
             last_height = new_height
 
+
 def is_button_found(driver, delay):
     """
     Try to find the "show more" button in the "skills" section.
@@ -233,7 +233,7 @@ def get_skills(driver):
     endofpage_reached = False
     attempt = 0
     MAX_ATTEMPTS = 3
-    delay = 3 # seconds
+    delay = 3  # seconds
     body = driver.find_element_by_tag_name("body")
     last_height = driver.execute_script(
         "return document.body.scrollHeight")
@@ -344,11 +344,11 @@ def scrape_url(query, url, driver):
                 "skills": skills
             }
             success = True
-        except TimeoutException as e:
+        except TimeoutException:
             print("\nINFO :: TimeoutException raised while " +
                   "getting URL\n" + url)
             print("INFO :: Attempt n." + str(attempt) + " of " +
-                str(MAX_ATTEMPTS) + "\nNext attempt in 60 seconds")
+                  str(MAX_ATTEMPTS) + "\nNext attempt in 60 seconds")
             sleep(60)
         if success:
             break
