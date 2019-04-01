@@ -54,11 +54,16 @@ for query in QUERIES:
     sleep(0.5)
     search_query.send_keys(Keys.RETURN)
     linkedin_urls = get_urls(driver, N_PAGES)
+    if len(linkedin_urls) == 0:
+        print("WARNING ::  "
+              "Couldn't get any URLs for the query " + query)
+        print("Please double-check that Google isn't blocking the query")
+        continue
     unseen_urls = get_unseen_urls(users,
                                   linkedin_urls)
     if len(linkedin_urls) != len(unseen_urls) and len(unseen_urls) != 0:
         print("INFO :: Resuming from URL", unseen_urls[0])
-    if len(unseen_urls) == 0:
+    elif len(unseen_urls) == len(linkedin_urls):
         print("INFO :: All URLs from " + str(N_PAGES) + " Google-search "
               "page(s) for the query " + query + " have already been "
               "scraped. Moving onto the next query if any.")
