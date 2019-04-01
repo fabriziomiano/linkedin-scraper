@@ -59,7 +59,7 @@ for query in QUERIES:
     if len(linkedin_urls) != len(unseen_urls) and len(unseen_urls) != 0:
         print("INFO :: Resuming from URL", unseen_urls[0])
     if len(unseen_urls) == 0:
-        print("INFO :: All URLs from " + N_PAGES + " Google-search "
+        print("INFO :: All URLs from " + str(N_PAGES) + " Google-search "
               "page(s) for the query " + query + " have already been "
               "scraped. Moving onto the next query if any.")
         continue
