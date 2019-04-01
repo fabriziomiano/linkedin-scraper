@@ -59,10 +59,10 @@ for query in QUERIES:
     if len(linkedin_urls) != len(unseen_urls) and len(unseen_urls) != 0:
         print("INFO :: Resuming from URL", unseen_urls[0])
     if len(unseen_urls) == 0:
-        print("INFO :: All URLs from %d Google-search "
-              "page(s) already scraped. Quitting" % N_PAGES)
-        driver.quit()
-        sys.exit()
+        print("INFO :: All URLs from " + N_PAGES + " Google-search "
+              "page(s) for the query " + query + " have already been "
+              "scraped. Moving onto the next query if any.")
+        continue
     for linkedin_url in unseen_urls:
         user_data = scrape_url(query, linkedin_url, driver)
         print_user_data(user_data)
