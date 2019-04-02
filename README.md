@@ -19,5 +19,7 @@ Edit the `conf.json` config file accordingly specifying the chrome bin path, e.g
 ```which google-chrome``` in a UNIX shell command line, the chrome driver path, the desired queries
 and so forth. 
 
-Finally, run with 
-```python scrape_lin.py -c conf.json```
+Finally, to scrape users run 
+```python scrape_users.py --conf conf.json```
+or jobs
+```python scrape_jobs.py --conf conf.json```
