@@ -79,23 +79,37 @@ def validate_user_data(user_data):
         return {}
 
 
-def init_driver(CHROME_PATH, CHROMEDRIVER_PATH):
+def init_driver(chrome_path, chromedriver_path):
     """
     Initialize Chrome driver
 
     """
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.binary_location = CHROME_PATH
+    chrome_options.binary_location = chrome_path
     chrome_options.add_argument("--normal")
     chrome_options.add_argument("--start-maximized")
     chrome_options.add_argument("--disable-extensions")
     chrome_options.add_argument("--disable-infobars")
-    driver = webdriver.Chrome(executable_path=CHROMEDRIVER_PATH,
+    driver = webdriver.Chrome(executable_path=chromedriver_path,
                               chrome_options=chrome_options)
     return driver
 
 
-def get_urls(driver, n_pages=1):
+def get_job_urls(soup):
+    """
+    Return a list of job URLs taken from the
+    results of a query on LinkedIn.
+
+    """
+    base_url = "http://www.linkedin.com"
+    job_urls = [base_url + url['href'].split('/?')[0]
+                for url in soup.find_all(
+                    class_="job-card-search__link-wrapper",
+                    href=True)]
+    return list(dict.fromkeys(job_urls))
+
+
+def get_profile_urls(driver, n_pages=1):
     """
     Return a list without repetitions of alphabetically sorted URLs
     taken from the results of a given query on Google search.
@@ -135,52 +149,37 @@ def login(driver, user, pwd):
     sign_in_button.click()
 
 
-def get_job_title(selector):
+def scroll_job_panel(driver):
     """
-    Get the job title of the user whose profile page is being scraped
-
-    """
-    job_title = selector.xpath(
-        '//*[starts-with(@class, "pv-top-card-section__headline"' +
-        ')]/text()').extract_first()
-    if job_title:
-        job_title = job_title.strip()
-    job_title = validate_field(job_title)
-    return job_title
-
-
-def get_location(selector):
-    """
-    Get the location of the user whose profile page is being scraped.
+    Scroll the left panel containing the job offers by sending PAGE_DOWN
+    key until the very end has been reached
 
     """
-    location = selector.xpath(
-        '//*[starts-with(@class, ' +
-        '"pv-top-card-section__location")]/text()').extract_first()
-    if location:
-        location = location.strip()
-    location = validate_field(location)
-    return location
+    panel = driver.find_element_by_class_name("jobs-search-results")
+    last_height = driver.execute_script(
+        "return document.getElementsByClassName(" +
+        "'jobs-search-results')[0].scrollHeight")
+    while True:
+        panel.send_keys(Keys.PAGE_DOWN)
+        sleep(0.2)
+        new_height = driver.execute_script(
+            "return document.getElementsByClassName(" +
+            "'jobs-search-results')[0].scrollHeight")
+        if new_height == last_height:
+            break
+        else:
+            last_height = new_height
+    javascript = (
+        "var x = document.getElementsByClassName("  +
+        "'jobs-search-results')[0]; x.scrollTo(0, x.scrollHeight)"
+    )
+    driver.execute_script(javascript)
 
 
-def get_degree(soup):
+
+def scroll_profile_page(driver):
     """
-    Get the last degree of the user whose profile page
-    is being scraped.
-
-    """
-    degree_tags = soup.find_all(class_="pv-entity__degree-name")
-    if len(degree_tags) != 0:
-        degree = degree_tags[0].get_text().split('\n')[2]
-        degree = validate_field(degree)
-    else:
-        degree = ''
-    return degree
-
-
-def scroll_to_end(driver):
-    """
-    Scroll until the end of a web page by sending the keys PAGE_DOWN
+    Scroll a profile page by sending the keys PAGE_DOWN
     until the end of the page has been reached.
 
     """
@@ -219,153 +218,14 @@ def is_button_found(driver, delay):
     return button_found, button_element
 
 
-def get_skills(driver):
-    """
-    Get the skills of the user whose profile page is being scraped.
-    Scroll down the page by sending the PAGE_DOWN button
-    until either the "show more" button in the skills section
-    has been found, or the end of the page has been reached
-    Return a list of skills.
-
-    """
-    skills = []
-    button_found = False
-    endofpage_reached = False
-    attempt = 0
-    MAX_ATTEMPTS = 3
-    delay = 3  # seconds
-    body = driver.find_element_by_tag_name("body")
-    last_height = driver.execute_script(
-        "return document.body.scrollHeight")
-    while not button_found:
-        body.send_keys(Keys.PAGE_DOWN)
-        sleep(2)
-        new_height = driver.execute_script(
-            "return document.body.scrollHeight")
-        button_found, showmore_button = is_button_found(driver, delay)
-        if button_found:
-            driver.execute_script("arguments[0].click();",
-                                  showmore_button)
-            sleep(2)
-            soup = bs(driver.page_source, 'html.parser')
-            skills_tags = soup.find_all(
-                class_="pv-skill-category-entity__name-text")
-            skills = [item.get_text(strip=True)
-                      for item in skills_tags]
-            skills = [validate_field(skill) for skill in skills]
-        if new_height == last_height:
-            attempt += 1
-            if attempt == MAX_ATTEMPTS:
-                endofpage_reached = True
-        else:
-            last_height = new_height
-        if button_found or endofpage_reached:
-            break
-    return skills
-
-
-def get_languages(soup):
-    """
-    Get the languages in the "Accomplishments" section
-    of the user whose profile page is being scraped.
-    Look for the accomplishment tags first, and get all the language
-    elements from them.
-    Return a list of languages.
-
-    """
-    try:
-        accomplishment_tags = soup.find_all(
-            class_='pv-accomplishments-block__list-container')
-        languages = [[lang_tag.get_text()
-                      for lang_tag in a.find_all('li')]
-                     for a in accomplishment_tags
-                     if a['id'] == "languages-expandable-content"][0]
-        languages = [validate_field(language) for language in languages]
-    except IndexError:
-        languages = []
-    return languages
-
-
-def get_name(selector):
-    """
-    Get the name of the user whose profile page is being scraped.
-
-    """
-    name = selector.xpath(
-        '//*[starts-with(@class' +
-        ', "pv-top-card-section__name")]/text()').extract_first()
-    if name:
-        name = name.strip()
-    name = validate_field(name)
-    return name
-
-
-def scrape_url(query, url, driver):
-    """
-    Get the user data for a given query and linkedin URL.
-    Call get_name() and get_job_title() to get name and
-    job title, respectively. Scroll down the given URL
-    to make the skill-section HTML code appear;
-    call get_skills() and get_degree() to extract the user skills
-    and their degree, respectively. Scroll down the page until its
-    end to extract the user languages by calling
-    get_languages().
-    Finally, return a dictionary with the extracted data.
-
-    """
-    attempt = 0
-    MAX_ATTEMPTS = 3
-    success = False
-    user_data = {}
-    while not success:
-        try:
-            attempt += 1
-            driver.get(url)
-            sleep(2)
-            sel = Selector(text=driver.page_source)
-            name = get_name(sel)
-            job_title = get_job_title(sel)
-            location = get_location(sel)
-            driver.execute_script("document.body.style.zoom='50%'")
-            sleep(3)
-            skills = get_skills(driver)
-            soup = bs(driver.page_source, 'html.parser')
-            degree = get_degree(soup)
-            scroll_to_end(driver)
-            languages = get_languages(soup)
-            user_data = {
-                "URL": url,
-                "name": name,
-                "query": query,
-                "job_title": job_title,
-                "degree": degree,
-                "location": location,
-                "languages": languages,
-                "skills": skills
-            }
-            success = True
-        except TimeoutException:
-            print("\nINFO :: TimeoutException raised while " +
-                  "getting URL\n" + url)
-            print("INFO :: Attempt n." + str(attempt) + " of " +
-                  str(MAX_ATTEMPTS) + "\nNext attempt in 60 seconds")
-            sleep(60)
-        if success:
-            break
-        if attempt == MAX_ATTEMPTS and not user_data:
-            print("INFO :: Max number of attempts reached. Skipping URL"
-                  "\nUser data will be empty.")
-    return validate_user_data(user_data)
-
-
-def print_user_data(user_data):
+def print_scraped_data(data):
     """
     Print the user data returned by scrape_url().
 
     """
     print()
-    for key in user_data:
-        print(key + ": " + str(user_data[key]))
+    for key in data:
+        print(key + ": " + str(data[key]))
 
 
 def save_json(file_path, dictionary):
@@ -378,7 +238,7 @@ def save_json(file_path, dictionary):
                   indent=2, separators=(',', ': '))
 
 
-def get_unseen_urls(users, urls):
+def get_unseen_urls(collection, urls):
     """
     Get a list of URLs that have not already been scraped.
     Loop over all the db entries and create a list with the
@@ -388,7 +248,7 @@ def get_unseen_urls(users, urls):
     Return a list of URLs which have not already been scraped.
 
     """
-    scraped_urls = [entry["URL"] for entry in users.find()]
+    scraped_urls = [entry["URL"] for entry in collection.find()]
     unseen_urls = list(set(urls) - set(scraped_urls))
     return unseen_urls
 
