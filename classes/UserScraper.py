@@ -3,12 +3,12 @@ A class to define the methods to scrape LinkedIn user-profile webpages
 
 """
 from selenium.webdriver.common.keys import Keys
+from selenium.common.exceptions import TimeoutException
 from parsel import Selector
 from utils import validate_field, scroll_profile_page, is_button_found,\
     validate_user_data
 from time import sleep
 from bs4 import BeautifulSoup as bs
-from selenium.common.exceptions import TimeoutException
 
 
 class UserScraper(object):
