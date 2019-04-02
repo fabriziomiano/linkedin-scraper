@@ -4,19 +4,17 @@
         "CHROME_PATH": "/path/to/chrome-executable",
         "LOG_DIRECTORY": "./logdir/",
         "N_PAGES": 1,
-        "QUERIES": [
-            "site:it.linkedin.com/in/ AND \"Direttore di Filiale\"",
-            "site:it.linkedin.com/in/ AND \"District Manager\"",
-            "site:it.linkedin.com/in/ AND \"Events Assistant\"",
-            "site:it.linkedin.com/in/ AND \"Junior Key Account Manager\"",
-            "site:it.linkedin.com/in/ AND \"Social Media Manager\"",
-            "site:it.linkedin.com/in/ AND \"Customer Care\"",
-            "site:it.linkedin.com/in/ AND \"Consulente Junior\"",
-            "site:it.linkedin.com/in/ AND \"Assistente alla clientela\"",
-            "site:it.linkedin.com/in/ AND \"Junior Project Manager\"",
-            "site:it.linkedin.com/in/ AND \"Junior HR\""
+	"USER_QUERIES": [
+	    "site:it.linkedin.com/in/ AND \"giurisprudenza\"",
+	    "site:it.linkedin.com/in/ AND \"archeologia\"",
+	    "site:it.linkedin.com/in/ AND \"biotecnologia\""
         ],
-        "HOST": "@cluster0-bicnw.mongodb.net/linkedin?retryWrites=true"
+	"JOB_QUERIES": [
+	    "laurea giurisprudenza",
+	    "laurea archeologia",
+	    "laurea biotecnologia"
+        ],
+        "HOST": "@mongo_host"
     },
     "credentials": {
         "LINUSERNAME": "user@email.com",
