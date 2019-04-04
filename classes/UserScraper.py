@@ -4,9 +4,8 @@ A class to define the methods to scrape LinkedIn user-profile webpages
 """
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
-from parsel import Selector
 from utils import validate_field, scroll_profile_page, is_button_found,\
-    validate_user_data
+    validate_user_data, filter_non_printable
 from time import sleep
 from bs4 import BeautifulSoup as bs
 
@@ -16,34 +15,49 @@ class UserScraper(object):
         self.driver = driver
 
         
-    def get_job_title(self, selector):
+    def get_name(self, soup):
+        """
+        Get the name of the user whose profile page is being scraped.
+
+        """
+        try:
+            name_tag = soup.find_all(class_=
+                                     "pv-top-card-section__name")[0]
+            name = name_tag.get_text(strip=True)
+            return name
+        except IndexError:
+            return ""
+
+
+    def get_job_title(self, soup):
         """
         Get the job title of the user whose profile 
         page is being scraped
 
         """
-        job_title = selector.xpath(
-            '//*[starts-with(@class, "pv-top-card-section__headline"' +
-            ')]/text()').extract_first()
-        if job_title:
-            job_title = job_title.strip()
-        job_title = validate_field(job_title)
-        return job_title
+        try:
+            job_title_tag = soup.find_all(class_=
+                                  "pv-top-card-section__headline")[0]
+            job_title = job_title_tag.get_text(strip=True)
+            job_title = filter_non_printable(job_title)
+            return job_title
+        except IndexError:
+            return ""
 
 
-    def get_location(self, selector):
+    def get_location(self, soup):
         """
         Get the location of the user whose profile 
         page is being scraped.
 
         """
-        location = selector.xpath(
-            '//*[starts-with(@class, ' +
-            '"pv-top-card-section__location")]/text()').extract_first()
-        if location:
-            location = location.strip()
-        location = validate_field(location)
-        return location
+        try:
+            location_tag = soup.find_all(class_=
+                                    "pv-top-card-section__location")[0]
+            location = location_tag.get_text(strip=True)
+            return location
+        except IndexError:
+            return ""
 
 
     def get_degree(self, soup):
@@ -129,20 +143,6 @@ class UserScraper(object):
         return languages
 
 
-    def get_name(self, selector):
-        """
-        Get the name of the user whose profile page is being scraped.
-
-        """
-        name = selector.xpath(
-            '//*[starts-with(@class' +
-            ', "pv-top-card-section__name")]/text()').extract_first()
-        if name:
-            name = name.strip()
-        name = validate_field(name)
-        return name
-
-
     def scrape_user(self, query, url):
         """
         Get the user data for a given query and linkedin URL.
@@ -165,16 +165,15 @@ class UserScraper(object):
                 attempt += 1
                 self.driver.get(url)
                 sleep(2)
-                sel = Selector(text=self.driver.page_source)
-                name = self.get_name(sel)
-                job_title = self.get_job_title(sel)
-                location = self.get_location(sel)
                 self.driver.execute_script(
                     "document.body.style.zoom='50%'")
                 sleep(3)
                 skills = self.get_skills()
                 scroll_profile_page(self.driver)
                 soup = bs(self.driver.page_source, 'html.parser')
+                name = self.get_name(soup)
+                job_title = self.get_job_title(soup)
+                location = self.get_location(soup)
                 degree = self.get_degree(soup)
                 languages = self.get_languages(soup)
                 user_data = {
