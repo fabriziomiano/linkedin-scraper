@@ -13,6 +13,7 @@ from validator_collection import checkers
 import json
 import os
 import errno
+import unicodedata
 
 
 def load_config(path):
@@ -250,3 +251,12 @@ def init_mongo(host, user, pwd):
     """
     client = MongoClient("mongodb+srv://" + user + ":" + pwd + host)
     return client
+
+
+def filter_non_printable(s):
+    """
+    Filter strings by removing non-printable chars
+
+    """
+    return ''.join(c for c in s
+                   if not unicodedata.category(c) in set(['Cf']))
