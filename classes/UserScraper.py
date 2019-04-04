@@ -117,14 +117,15 @@ class UserScraper(object):
         Return a list of languages.
 
         """
+        languages = []
         accomplishment_tags = soup.find_all(
-            class_='pv-accomplishments-block__list-container')
+            class_="pv-accomplishments-block__list-container")
         for a in accomplishment_tags:
             try:
                 if a["id"] == "languages-expandable-content":
                     languages = [l.get_text() for l in a.find_all("li")]
             except KeyError:
-                languages = []
+                pass
         return languages
 
 
