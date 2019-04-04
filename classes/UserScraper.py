@@ -172,9 +172,9 @@ class UserScraper(object):
                     "document.body.style.zoom='50%'")
                 sleep(3)
                 skills = self.get_skills()
-                soup = bs(self.driver.page_source, 'html.parser')
                 degree = self.get_degree(soup)
                 scroll_profile_page(self.driver)
+                soup = bs(self.driver.page_source, 'html.parser')
                 languages = self.get_languages(soup)
                 user_data = {
                     "URL": url,
