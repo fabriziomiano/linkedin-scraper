@@ -9,7 +9,7 @@ Write dataset to mongoDB with the scraped data
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
 from utils import init_driver, get_job_urls, login, print_scraped_data,\
-    save_json, create_nonexistent_dir, load_config, get_unseen_urls,\
+    create_nonexistent_dir, load_config, get_unseen_urls,\
     init_mongo, scroll_job_panel
 from time import sleep, time
 from bs4 import BeautifulSoup as bs
@@ -34,7 +34,6 @@ parameters = conf["parameters"]
 credentials = conf["credentials"]
 CHROME_PATH = parameters["CHROME_PATH"]
 CHROMEDRIVER_PATH = parameters["CHROMEDRIVER_PATH"]
-LOG_DIRECTORY = parameters["LOG_DIRECTORY"] + 'jobs/'
 QUERIES = parameters["JOB_QUERIES"]
 LINUSERNAME = credentials["LINUSERNAME"]
 LINPWD = credentials["LINPWD"]
@@ -47,7 +46,6 @@ jobs = db["jobs"]
 driver = init_driver(CHROME_PATH, CHROMEDRIVER_PATH)
 driver.get("https://www.linkedin.com")
 login(driver, LINUSERNAME, LINPWD)
-create_nonexistent_dir(LOG_DIRECTORY)
 JOB_SEARCH_URL = "https://www.linkedin.com/jobs/search/?keywords="
 for query in QUERIES:
     driver.get(JOB_SEARCH_URL + query)
@@ -92,7 +90,5 @@ for query in QUERIES:
         if job_data and\
            not db["jobs"].count_documents(job_data, limit=1):
             print_scraped_data(job_data)
-            job_file = LOG_DIRECTORY + str(time())
-            save_json(job_file, job_data)            
             jobs.insert_one(job_data)
 driver.quit()

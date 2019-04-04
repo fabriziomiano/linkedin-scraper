@@ -228,16 +228,6 @@ def print_scraped_data(data):
         print(key + ": " + str(data[key]))
 
 
-def save_json(file_path, dictionary):
-    """
-    Save a json file at a given path.
-
-    """
-    with open(file_path, 'w', encoding='utf8') as f:
-        json.dump(dictionary, f, ensure_ascii=False,
-                  indent=2, separators=(',', ': '))
-
-
 def get_unseen_urls(collection, urls):
     """
     Get a list of URLs that have not already been scraped.

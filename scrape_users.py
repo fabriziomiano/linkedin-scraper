@@ -9,7 +9,7 @@ Write dataset to mongoDB with the scraped data
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import ElementNotInteractableException
 from utils import init_driver, get_profile_urls, login,\
-    print_scraped_data, save_json, create_nonexistent_dir, load_config,\
+    print_scraped_data, create_nonexistent_dir, load_config,\
     get_unseen_urls, init_mongo
 from time import sleep, time
 from classes.UserScraper import UserScraper
@@ -33,7 +33,6 @@ parameters = conf["parameters"]
 credentials = conf["credentials"]
 CHROME_PATH = parameters["CHROME_PATH"]
 CHROMEDRIVER_PATH = parameters["CHROMEDRIVER_PATH"]
-LOG_DIRECTORY = parameters["LOG_DIRECTORY"] + 'profiles/'
 QUERIES = parameters["USER_QUERIES"]
 N_PAGES = parameters["N_PAGES"]
 LINUSERNAME = credentials["LINUSERNAME"]
@@ -47,7 +46,6 @@ users = db["users"]
 driver = init_driver(CHROME_PATH, CHROMEDRIVER_PATH)
 driver.get("https://www.linkedin.com")
 login(driver, LINUSERNAME, LINPWD)
-create_nonexistent_dir(LOG_DIRECTORY)
 us = UserScraper(driver)
 for query in QUERIES:
     driver.get("https://www.google.com")
@@ -81,7 +79,5 @@ for query in QUERIES:
         if user_data and\
            not db["users"].count_documents(user_data, limit=1):
             print_scraped_data(user_data)
-            user_file = LOG_DIRECTORY + str(time())
-            save_json(user_file, user_data)
             users.insert_one(user_data)
 driver.quit()
