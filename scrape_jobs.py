@@ -69,6 +69,7 @@ for query in QUERIES:
             print("\nINFO :: TimeoutException raised while getting " +\
                   "URL\n" + url)
     if len(job_urls) == 0:
+        print()
         print("WARNING :: Could not get any URLs for the query\n" +
               query)
         print("Please double-check that LinkedIn is not " +

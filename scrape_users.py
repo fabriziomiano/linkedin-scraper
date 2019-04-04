@@ -60,6 +60,7 @@ for query in QUERIES:
     search_query.send_keys(Keys.RETURN)
     profile_urls = get_profile_urls(driver, N_PAGES)
     if len(profile_urls) == 0:
+        print()
         print("WARNING :: " +
               "Could not get any URLs for the query\n" + query)
         print("Please double-check that Google is not " +
