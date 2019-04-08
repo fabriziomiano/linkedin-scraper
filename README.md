@@ -1,5 +1,8 @@
 # LIn Scraper
 
+## Disclaimer
+Scraping data off of LinkedIn is against their User Agreement. This is purely intended for educational purposes.
+
 ## Acknowledgements
 Thanks to David Craven who I took inspiration from ([link here](https://www.linkedin.com/pulse/how-easy-scraping-data-from-linkedin-profiles-david-craven/))
 
