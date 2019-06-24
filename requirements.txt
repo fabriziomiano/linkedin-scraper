@@ -19,7 +19,7 @@ lxml==4.3.2
 numpy==1.16.2
 pandas==0.24.2
 parsel==1.5.1
-parso==0.3.4
+parso==0.5.0
 pexpect==4.6.0
 pickleshare==0.7.5
 Pillow==5.4.1
