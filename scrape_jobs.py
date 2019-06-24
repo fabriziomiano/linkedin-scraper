@@ -6,12 +6,11 @@ for each scraped job offer.
 Write dataset to mongoDB with the scraped data
 
 """
-from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException
 from utils import init_driver, get_job_urls, login, print_scraped_data,\
-    create_nonexistent_dir, load_config, get_unseen_urls,\
+    load_config, get_unseen_urls,\
     init_mongo, scroll_job_panel
-from time import sleep, time
+from time import sleep
 from bs4 import BeautifulSoup as bs
 from classes.JobScraper import JobScraper
 import argparse
@@ -66,8 +65,10 @@ for query in QUERIES:
             job_urls.extend(get_job_urls(soup))
             start += 25
         except TimeoutException:
-            print("\nINFO :: TimeoutException raised while getting " +\
-                  "URL\n" + url)
+            print(
+                "\nINFO :: TimeoutException raised while getting " +
+                "URL\n" + url
+            )
     if len(job_urls) == 0:
         print()
         print("WARNING :: Could not get any URLs for the query\n" +

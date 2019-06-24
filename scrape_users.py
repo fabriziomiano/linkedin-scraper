@@ -9,9 +9,9 @@ Write dataset to mongoDB with the scraped data
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import ElementNotInteractableException
 from utils import init_driver, get_profile_urls, login,\
-    print_scraped_data, create_nonexistent_dir, load_config,\
-    get_unseen_urls, init_mongo
-from time import sleep, time
+    print_scraped_data, load_config,\
+    get_unseen_urls, connect_mongo
+from time import sleep
 from classes.UserScraper import UserScraper
 import argparse
 import sys
@@ -40,7 +40,7 @@ LINPWD = credentials["LINPWD"]
 MONGOUSER = credentials["MONGOUSER"]
 MONGOPWD = credentials["MONGOPWD"]
 HOST = parameters["HOST"]
-client = init_mongo(HOST, MONGOUSER, MONGOPWD)
+client = connect_mongo(HOST, MONGOUSER, MONGOPWD)
 db = client["linkedin"]
 users = db["users"]
 driver = init_driver(CHROME_PATH, CHROMEDRIVER_PATH)

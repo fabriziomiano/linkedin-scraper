@@ -4,6 +4,7 @@
 *.ipynb
 *myconf*.json
 *.log
+*.json
 
 # dirs
 *.ipynb*

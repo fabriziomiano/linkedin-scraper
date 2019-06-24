@@ -1,4 +1,3 @@
-from parsel import Selector
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -7,7 +6,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException,\
     TimeoutException
-from bs4 import BeautifulSoup as bs
 from pymongo import MongoClient
 from validator_collection import checkers
 import json
@@ -171,11 +169,10 @@ def scroll_job_panel(driver):
         else:
             last_height = new_height
     javascript = (
-        "var x = document.getElementsByClassName("  +
+        "var x = document.getElementsByClassName(" +
         "'jobs-search-results')[0]; x.scrollTo(0, x.scrollHeight)"
     )
     driver.execute_script(javascript)
-
 
 
 def scroll_profile_page(driver):
@@ -244,9 +241,9 @@ def get_unseen_urls(collection, urls):
     return unseen_urls
 
 
-def init_mongo(host, user, pwd):
+def connect_mongo(host, user, pwd):
     """
-    Initialize mongodb client instance
+    Connect mongodb client
 
     """
     client = MongoClient("mongodb+srv://" + user + ":" + pwd + host)

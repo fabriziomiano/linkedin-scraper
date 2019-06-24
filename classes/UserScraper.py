@@ -14,51 +14,46 @@ class UserScraper(object):
     def __init__(self, driver):
         self.driver = driver
 
-        
     def get_name(self, soup):
         """
         Get the name of the user whose profile page is being scraped.
 
         """
         try:
-            name_tag = soup.find_all(class_=
-                                     "pv-top-card-section__name")[0]
+            name_tag = soup.find_all(class_="pv-top-card-section__name")[0]
             name = name_tag.get_text(strip=True)
             return name
         except IndexError:
             return ""
 
-
     def get_job_title(self, soup):
         """
-        Get the job title of the user whose profile 
+        Get the job title of the user whose profile
         page is being scraped
 
         """
         try:
-            job_title_tag = soup.find_all(class_=
-                                  "pv-top-card-section__headline")[0]
+            job_title_tag = soup.find_all(
+                class_="pv-top-card-section__headline")[0]
             job_title = job_title_tag.get_text(strip=True)
             job_title = filter_non_printable(job_title)
             return job_title
         except IndexError:
             return ""
 
-
     def get_location(self, soup):
         """
-        Get the location of the user whose profile 
+        Get the location of the user whose profile
         page is being scraped.
 
         """
         try:
-            location_tag = soup.find_all(class_=
-                                    "pv-top-card-section__location")[0]
+            location_tag = soup.find_all(
+                class_="pv-top-card-section__location")[0]
             location = location_tag.get_text(strip=True)
             return location
         except IndexError:
             return ""
-
 
     def get_degree(self, soup):
         """
@@ -74,7 +69,6 @@ class UserScraper(object):
         else:
             degree = ''
         return degree
-
 
     def get_skills(self):
         """
@@ -103,7 +97,7 @@ class UserScraper(object):
                 self.driver, delay)
             if button_found:
                 self.driver.execute_script("arguments[0].click();",
-                                      showmore_button)
+                                           showmore_button)
                 sleep(2)
                 soup = bs(self.driver.page_source, 'html.parser')
                 skills_tags = soup.find_all(
@@ -120,7 +114,6 @@ class UserScraper(object):
             if button_found or endofpage_reached:
                 break
         return skills
-
 
     def get_languages(self, soup):
         """
@@ -141,7 +134,6 @@ class UserScraper(object):
             except KeyError:
                 pass
         return languages
-
 
     def scrape_user(self, query, url):
         """
