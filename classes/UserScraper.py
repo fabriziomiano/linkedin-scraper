@@ -12,12 +12,20 @@ from bs4 import BeautifulSoup as bs
 
 class UserScraper(object):
     def __init__(self, driver):
+        """
+        Initialize the class
+
+        :param driver: selenium chrome driver object
+        """
         self.driver = driver
 
-    def get_name(self, soup):
+    @staticmethod
+    def get_name(soup):
         """
         Get the name of the user whose profile page is being scraped.
 
+        :param soup: BeautifulSoup object
+        :return: name: str name of the user
         """
         try:
             name_tag = soup.find_all(class_="pv-top-card-section__name")[0]
@@ -26,11 +34,14 @@ class UserScraper(object):
         except IndexError:
             return ""
 
-    def get_job_title(self, soup):
+    @staticmethod
+    def get_job_title(soup):
         """
         Get the job title of the user whose profile
         page is being scraped
 
+        :param soup: BeautifulSoup object
+        :return: job_title: str
         """
         try:
             job_title_tag = soup.find_all(
@@ -41,11 +52,14 @@ class UserScraper(object):
         except IndexError:
             return ""
 
-    def get_location(self, soup):
+    @staticmethod
+    def get_location(soup):
         """
         Get the location of the user whose profile
         page is being scraped.
 
+        :param soup: BeautifulSoup object
+        :return: location: str
         """
         try:
             location_tag = soup.find_all(
@@ -55,11 +69,14 @@ class UserScraper(object):
         except IndexError:
             return ""
 
-    def get_degree(self, soup):
+    @staticmethod
+    def get_degree(soup):
         """
         Get the last degree of the user whose profile page
         is being scraped.
 
+        :param soup: BeautifulSoup object
+        :return: degree: str
         """
         degree_tags = soup.find_all(
             class_="pv-entity__degree-name")
@@ -78,12 +95,13 @@ class UserScraper(object):
         has been found, or the end of the page has been reached
         Return a list of skills.
 
+        :return: list: skills
         """
         skills = []
         button_found = False
         endofpage_reached = False
         attempt = 0
-        MAX_ATTEMPTS = 3
+        max_attempts = 3
         delay = 3  # seconds
         body = self.driver.find_element_by_tag_name("body")
         last_height = self.driver.execute_script(
@@ -107,7 +125,7 @@ class UserScraper(object):
                 skills = [validate_field(skill) for skill in skills]
             if new_height == last_height:
                 attempt += 1
-                if attempt == MAX_ATTEMPTS:
+                if attempt == max_attempts:
                     endofpage_reached = True
             else:
                 last_height = new_height
@@ -115,7 +133,8 @@ class UserScraper(object):
                 break
         return skills
 
-    def get_languages(self, soup):
+    @staticmethod
+    def get_languages(soup):
         """
         Get the languages in the "Accomplishments" section
         of the user whose profile page is being scraped.
@@ -123,6 +142,8 @@ class UserScraper(object):
         elements from them.
         Return a list of languages.
 
+        :param soup: BeautifulSoup object
+        :return: list: languages list
         """
         languages = []
         accomplishment_tags = soup.find_all(
@@ -147,9 +168,12 @@ class UserScraper(object):
         get_languages().
         Finally, return a dictionary with the extracted data.
 
+        :param query: str
+        :param url: str URL to scrape
+        :return:
         """
         attempt = 0
-        MAX_ATTEMPTS = 3
+        max_attempts = 3
         success = False
         user_data = {}
         while not success:
@@ -183,12 +207,12 @@ class UserScraper(object):
                 print("\nINFO :: TimeoutException raised while " +
                       "getting URL\n" + url)
                 print("INFO :: Attempt n." + str(attempt) + " of " +
-                      str(MAX_ATTEMPTS) +
+                      str(max_attempts) +
                       "\nNext attempt in 60 seconds")
                 sleep(60)
             if success:
                 break
-            if attempt == MAX_ATTEMPTS and not user_data:
+            if attempt == max_attempts and not user_data:
                 print("INFO :: Max number of attempts reached. " +
                       "Skipping URL" +
                       "\nUser data will be empty.")

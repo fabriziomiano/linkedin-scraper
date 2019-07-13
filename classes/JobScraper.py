@@ -1,6 +1,5 @@
 """
 A class to define the methods to scrape LinkedIn job web pages
-
 """
 
 
@@ -9,6 +8,9 @@ class JobScraper(object):
         """
         Initialize the class
 
+        :param soup: BeautifulSoup instance
+        :param url: str job URL to scrape
+        :param query: str query to perform
         """
         self.soup = soup
         self.url = url
@@ -17,8 +19,8 @@ class JobScraper(object):
     def get_job_skills(self):
         """
         Get the skills required by the job offer being scraped.
-        Return a list of skills.
 
+        :return: list of skills
         """
         requested_skills = [rq.get_text() for rq in self.soup.find_all(
             class_="jobs-ppc-criteria__value")]
@@ -29,6 +31,7 @@ class JobScraper(object):
         Get the job title of the job page is being scraped.
         Return a string containing the job title
 
+        :return: str job title
         """
         try:
             job_title = self.soup.find_all(
@@ -50,6 +53,8 @@ class JobScraper(object):
             is not empty, otherwise get the location string from the
             "jobs-top-card__bullet" HTML class
 
+            :param loc: str of the location
+            :return: str location
             """
             if loc:
                 return loc
@@ -74,6 +79,7 @@ class JobScraper(object):
         Get the job data by using the get* methods of the class.
         Return a dictionary
 
+        :return: dict job data
         """
         skills = self.get_job_skills()
         if len(skills) == 0:
