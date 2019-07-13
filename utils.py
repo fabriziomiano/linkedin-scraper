@@ -2,7 +2,7 @@ from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException,\
     TimeoutException
@@ -18,6 +18,8 @@ def load_config(path):
     """
     Load configuration file with all the needed parameters
 
+    :param path: str path of the conf file
+    :return: dict
     """
     with open(path, 'r') as conf_file:
         conf = json.load(conf_file)
@@ -29,6 +31,9 @@ def create_nonexistent_dir(path, exc_raise=False):
     Create directory from given path
     Return True if created, False if it exists
 
+    :param path: str dir path
+    :param exc_raise: bool raise exception
+    :return: str path of the created dir, None otherwise
     """
     try:
         os.makedirs(path)
@@ -45,9 +50,11 @@ def create_nonexistent_dir(path, exc_raise=False):
 
 def validate_field(field):
     """
-    return field if it exists
+    Return field if it exists
     otherwise empty string
 
+    :param field: string to validate
+    :return: field: input string if not empty, empty string otherwise
     """
     if field:
         pass
@@ -63,6 +70,8 @@ def validate_user_data(user_data):
     Return an empty dictionary if main keys' values are empty,
     otherwise the original dictionary.
 
+    :param user_data:
+    :return: dict
     """
     try:
         if user_data["skills"] == []\
@@ -80,8 +89,10 @@ def validate_user_data(user_data):
 
 def init_driver(chrome_path, chromedriver_path):
     """
-    Initialize Chrome driver
-
+    Iniitialize Chrome driver
+    :param chrome_path: str chrome executable path
+    :param chromedriver_path: str chrome driver path
+    :return: selenium driver object
     """
     chrome_options = webdriver.ChromeOptions()
     chrome_options.binary_location = chrome_path
@@ -99,6 +110,8 @@ def get_job_urls(soup):
     Return a list of job URLs taken from the
     results of a query on LinkedIn.
 
+    :param soup: BeautifulSoup instance
+    :return: list of linkedin-job URLs
     """
     base_url = "http://www.linkedin.com"
     job_urls = [base_url + url['href'].split('/?')[0]
@@ -113,6 +126,9 @@ def get_profile_urls(driver, n_pages=1):
     Return a list without repetitions of alphabetically sorted URLs
     taken from the results of a given query on Google search.
 
+    :param driver: selenium chrome driver object
+    :param n_pages: int number of google pages to loop over
+    :return: list of linkedin-profile URLs
     """
     linkedin_urls = []
     for i in range(n_pages):
@@ -137,6 +153,10 @@ def login(driver, user, pwd):
     Type user email and password in the relevant fields and
     perform log in on linkedin.com by using the given credentials.
 
+    :param driver: selenium chrome driver object
+    :param user: str username, email
+    :param pwd: str password
+    :return: None
     """
     username = driver.find_element_by_class_name('login-email')
     username.send_keys(user)
@@ -153,6 +173,8 @@ def scroll_job_panel(driver):
     Scroll the left panel containing the job offers by sending PAGE_DOWN
     key until the very end has been reached
 
+    :param driver: selenium chrome driver object
+    :return: None
     """
     panel = driver.find_element_by_class_name("jobs-search-results")
     last_height = driver.execute_script(
@@ -180,6 +202,8 @@ def scroll_profile_page(driver):
     Scroll a profile page by sending the keys PAGE_DOWN
     until the end of the page has been reached.
 
+    :param driver: selenium chrome driver object
+    :return:
     """
     body = driver.find_element_by_tag_name("body")
     last_height = driver.execute_script(
@@ -200,16 +224,19 @@ def is_button_found(driver, delay):
     Try to find the "show more" button in the "skills" section.
     Return a boolean and the button element.
 
+    :param driver: selenium chrome driver object
+    :param delay: float delay in seconds
+    :return:
     """
     button_found = False
     button_element = None
     try:
-        button_element = WebDriverWait(driver, delay).until(
-            EC.presence_of_element_located((
-                By.XPATH, "//button[@class=" +
-                "'pv-profile-section__card-action-bar " +
-                "pv-skills-section__additional-skills " +
-                "artdeco-container-card-action-bar']")))
+        condition_is_met = expected_conditions.presence_of_element_located(
+                (By.XPATH, "//button[@class=" +
+                 "'pv-profile-section__card-action-bar " +
+                 "pv-skills-section__additional-skills " +
+                 "artdeco-container-card-action-bar']"))
+        button_element = WebDriverWait(driver, delay).until(condition_is_met)
         button_found = True
     except TimeoutException:
         pass
@@ -235,6 +262,9 @@ def get_unseen_urls(collection, urls):
     for a given query.
     Return a list of URLs which have not already been scraped.
 
+    :param collection: Mongo DB collection
+    :param urls: lsit of URLs to check
+    :return: list of unseen URLs
     """
     scraped_urls = [entry["URL"] for entry in collection.find()]
     unseen_urls = list(set(urls) - set(scraped_urls))
@@ -243,17 +273,26 @@ def get_unseen_urls(collection, urls):
 
 def connect_mongo(host, user, pwd):
     """
-    Connect mongodb client
+    Conncect Mongo Client
 
+    :param host:
+    :param user:
+    :param pwd:
+    :return: client: Mongo client object
     """
     client = MongoClient("mongodb+srv://" + user + ":" + pwd + host)
     return client
 
 
-def filter_non_printable(s):
+def filter_non_printable(string_to_filter):
     """
-    Filter strings by removing non-printable chars
+    Filter string 's' by removing non-printable chars
 
+    :param string_to_filter:
+    :return:
     """
-    return ''.join(c for c in s
-                   if not unicodedata.category(c) in set(['Cf']))
+    output_string = ''.join(
+        c for c in string_to_filter
+        if not unicodedata.category(c) in set('Cf')
+    )
+    return output_string
