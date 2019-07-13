@@ -17,16 +17,17 @@ import argparse
 import sys
 
 
-args = sys.argv
 parser = argparse.ArgumentParser(
     description=("Scrape linkedin profiles based on the " +
                  "queries specified in the conf file")
 )
-parser.add_argument('-c', '--conf',
-                    type=str,
-                    metavar='',
-                    required=True,
-                    help='Specify the path of the configuration file')
+parser.add_argument(
+    '-c', '--conf',
+    type=str,
+    metavar='',
+    required=True,
+    help='Specify the path of the configuration file'
+)
 args = parser.parse_args()
 conf = load_config(args.conf)
 parameters = conf["parameters"]
