@@ -1,17 +1,14 @@
 import pytesseract
-import sys
 import argparse
-try:
-    import Image
-except ImportError:
-    from PIL import Image
+from PIL import Image
 from subprocess import check_output
 
 
-def resolve(path):
+def resolve(image_path):
     print("Resampling the Image")
-    check_output(['convert', path, '-resample', '600', path])
-    return pytesseract.image_to_string(Image.open(path))
+    check_output(
+        ['convert', image_path, '-resample', '600', image_path])
+    return pytesseract.image_to_string(Image.open(image_path))
 
 
 if __name__ == "__main__":
