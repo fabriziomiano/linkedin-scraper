@@ -8,16 +8,13 @@ Write dataset to mongoDB with the scraped data
 """
 from selenium.common.exceptions import TimeoutException
 from utils import init_driver, get_job_urls, login, print_scraped_data,\
-    load_config, get_unseen_urls,\
-    init_mongo, scroll_job_panel
+    load_config, get_unseen_urls, scroll_job_panel, connect_mongo
 from time import sleep
-from bs4 import BeautifulSoup as bs
+from bs4 import BeautifulSoup
 from classes.JobScraper import JobScraper
 import argparse
-import sys
 
 
-args = sys.argv
 parser = argparse.ArgumentParser(
     description=("Scrape linkedin job offers based on the " +
                  "queries specified in the conf file")
@@ -39,7 +36,7 @@ LINPWD = credentials["LINPWD"]
 MONGOUSER = credentials["MONGOUSER"]
 MONGOPWD = credentials["MONGOPWD"]
 HOST = parameters["HOST"]
-client = init_mongo(HOST, MONGOUSER, MONGOPWD)
+client = connect_mongo(HOST, MONGOUSER, MONGOPWD)
 db = client["linkedin"]
 jobs = db["jobs"]
 driver = init_driver(CHROME_PATH, CHROMEDRIVER_PATH)
@@ -50,18 +47,18 @@ for query in QUERIES:
     driver.get(JOB_SEARCH_URL + query)
     sleep(0.5)
     scroll_job_panel(driver)
-    soup = bs(driver.page_source, 'html.parser')
+    soup = BeautifulSoup(driver.page_source, 'html.parser')
     n_results_element = soup.find(class_="t-12 t-black--light t-normal")
     n_results_string = n_results_element.get_text()
     n_results = int(n_results_string.split()[0].replace(',', ''))
     job_urls = get_job_urls(soup)
     start = 25
+    url = JOB_SEARCH_URL + query + "&start=" + str(start)
     while start < n_results:
         try:
-            url = JOB_SEARCH_URL + query + "&start=" + str(start)
             driver.get(url)
             scroll_job_panel(driver)
-            soup = bs(driver.page_source, 'html.parser')
+            soup = BeautifulSoup(driver.page_source, 'html.parser')
             job_urls.extend(get_job_urls(soup))
             start += 25
         except TimeoutException:
@@ -86,7 +83,7 @@ for query in QUERIES:
         continue
     for url in unseen_urls:
         driver.get(url)
-        soup = bs(driver.page_source, 'html.parser')
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
         js = JobScraper(soup, url, query)
         job_data = js.get_job_data()
         if job_data and\
