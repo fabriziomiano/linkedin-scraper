@@ -1,4 +1,4 @@
-# LIn Scraper
+# LinkedIn Scraper
 
 ## Disclaimer
 Scraping data off of LinkedIn is against their User Agreement. This is purely intended for educational purposes.
