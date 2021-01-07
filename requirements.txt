@@ -15,7 +15,7 @@ jedi==0.13.3
 jsonschema==3.0.1
 jupyter-client==5.2.4
 jupyter-core==4.4.0
-lxml==4.3.2
+lxml==4.6.2
 numpy==1.16.2
 pandas==0.24.2
 parsel==1.5.1
